@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rescue USB Hub</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#5d6773;--bd:#dde1e6;--ac:#0b6bcb;--ok:#18794e;--lic:#9a5b00;--wn:#a3260c}
+@media(prefers-color-scheme:dark){:root{--bg:#14171b;--card:#1d2127;--tx:#e8ebef;--mu:#9aa5b1;--bd:#2d333b;--ac:#58a6ff;--ok:#4cc38a;--lic:#e3a33b;--wn:#ff6b57}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+.w{max-width:1040px;margin:0 auto;padding:20px}h1{margin:0 0 4px;font-size:26px}h2{font-size:18px;margin:28px 0 10px}
+.mu{color:var(--mu)}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.n{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--ac);color:#fff;text-align:center;font-weight:700;margin-right:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text]{flex:1;min-width:200px;padding:8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)}
+button,.btn{padding:7px 12px;border:1px solid var(--ac);background:var(--ac);color:#fff;border-radius:6px;cursor:pointer;text-decoration:none;font-size:14px;display:inline-block}
+button.g,.btn.g{background:transparent;color:var(--ac)}button:disabled{opacity:.4;cursor:not-allowed}
+button.big{font-size:15px;padding:12px 18px;font-weight:600}
+.tabs button{background:transparent;color:var(--tx);border-color:var(--bd)}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.it h3{margin:0;font-size:16px;display:inline}.tag{font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid;margin-left:6px}
+.free{color:var(--ok)}.lic{color:var(--lic)}.apps{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0}
+.apps span{font-size:12px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:1px 6px}
+pre{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px;margin:8px 0}
+label{cursor:pointer}small{font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}td,th{border:1px solid var(--bd);padding:6px 8px;text-align:left}
+.warn{border-left:3px solid var(--wn);padding:8px 12px;background:var(--bg);border-radius:0 8px 8px 0}
+.empty{color:var(--mu);padding:14px;text-align:center}
+</style>
+</head>
+<body><div class="w">
+<h1>Rescue USB Hub</h1>
+<p class="mu">Chọn gói có sẵn hoặc tự chọn từng mục, bấm một nút là có ngay bộ cài. Mở file này trực tiếp (bấm đúp) hoặc qua web đều dùng được, không cần server.</p>
+
+<h2>Gói đề xuất (1 click)</h2>
+<div class="grid" id="presets"></div>
+<p class="mu"><small>Bấm vào gói sẽ tự chọn đúng mục rồi tải ngay bộ cài khớp với hệ điều hành máy bạn đang dùng (<span id="detected">...</span>). Chạy xong là có USB boot.</small></p>
+
+<h2>Tự chọn</h2>
+<div class="card"><div class="row">
+<input type="text" id="q" placeholder="Tìm theo tên, công dụng, ứng dụng... (vd: mật khẩu, RAM, driver, Windows)">
+<button class="g" id="clear">Bỏ chọn tất cả</button>
+</div>
+<div class="row tabs" id="tabs" style="margin-top:8px"></div>
+</div>
+<div class="grid" id="grid" style="margin-top:10px"></div>
+
+<h2>Máy chủ chứa ISO (tùy chọn)</h2>
+<div class="card"><div class="row"><input type="text" id="mirror" aria-label="URL máy chủ ISO"><button class="g" id="save">Lưu</button></div>
+<small class="mu">Bản mã nguồn mở sẽ tải từ <code>URL/tên-file.iso</code> trên server của bạn nếu có. Windows luôn tải chính thức từ Microsoft; vài công cụ cứu hộ chuyên dụng phải tải tay từ trang gốc (trang sẽ ghi rõ).</small></div>
+
+<h2>Dành dung lượng USB làm ổ lưu trữ (tùy chọn)</h2>
+<div class="card">
+<p class="mu">USB còn dư chỗ sau khi chứa ISO? Dành riêng một phần làm ổ lưu trữ bình thường (chép file qua lại), phần này tách biệt với vùng boot nên không bị Ventoy ghi đè.</p>
+<div class="row">
+<select id="reserve"><option value="0">Không dành riêng</option><option value="4">4 GB</option><option value="8">8 GB</option><option value="16">16 GB</option><option value="32">32 GB</option><option value="custom">Tùy chỉnh...</option></select>
+<input type="text" id="reserveCustom" placeholder="Số GB" style="max-width:100px;display:none">
+</div>
+</div>
+
+<h2>Tạo bộ cài thủ công</h2>
+<div class="card">
+<p><b id="cnt">0</b> mục đã chọn, khoảng <b id="tot">0</b> GB. Cần USB từ 16 GB, nên 32 GB trở lên nếu có Windows, cộng thêm phần lưu trữ nếu chọn ở trên.</p>
+<div class="row"><button id="gw" disabled>Tải bộ cài cho Windows (.bat)</button><button class="g" id="gl" disabled>Tải bộ cài cho Linux (.sh)</button></div>
+<pre>Windows:  bấm đúp vào rescue-setup.bat (Windows sẽ hỏi quyền Admin, bấm Yes là chạy)
+Linux:    sudo bash rescue-usb.sh install /dev/sdX</pre>
+<small class="mu">Bộ cài sẽ XÓA SẠCH USB và yêu cầu gõ lại đúng tên ổ để xác nhận — đây là bước an toàn bắt buộc, không tự động hóa được vì có thể chọn nhầm ổ.</small>
+</div>
+
+<h2>Vì sao cắm USB vào máy cứ vào thẳng Windows?</h2>
+<div class="card warn">
+<p><b>USB không tự "giành quyền" boot trước ổ cứng.</b> Máy tính luôn boot theo thứ tự đặt trong BIOS/UEFI, mặc định thường là ổ cứng trước. Cắm USB vào mà không đổi gì thì máy bỏ qua USB và vào thẳng Windows như cũ — đây là hành vi bình thường, không phải USB hỏng.</p>
+<p><b>Cách vào đúng USB mỗi lần cần cứu hộ (không cần đổi cấu hình lâu dài):</b></p>
+<ol>
+<li>Cắm USB trực tiếp vào cổng máy (tránh qua hub).</li>
+<li>Khởi động lại máy, bấm liên tục phím <b>boot menu</b> ngay khi vừa bật nguồn (xem bảng bên dưới theo hãng máy).</li>
+<li>Một danh sách ổ đĩa hiện ra — chọn tên USB (thường ghi "Ventoy" hoặc tên hãng USB).</li>
+<li>Nếu không thấy USB trong danh sách: vào BIOS (thường phím F2/Del), tắt <b>Secure Boot</b> và <b>Fast Boot/Fast Startup</b>, lưu lại rồi thử lại bước 2.</li>
+</ol>
+<table><tr><th>Hãng máy</th><th>Phím boot menu</th><th>Phím vào BIOS</th></tr>
+<tr><td>Dell</td><td>F12</td><td>F2</td></tr>
+<tr><td>HP</td><td>F9 hoặc Esc</td><td>F10</td></tr>
+<tr><td>Lenovo / ThinkPad</td><td>F12 (có máy Fn+F12)</td><td>F1 / F2</td></tr>
+<tr><td>Asus</td><td>Esc hoặc F8</td><td>F2 / Del</td></tr>
+<tr><td>Acer</td><td>F12</td><td>F2 / Del</td></tr>
+<tr><td>MSI</td><td>F11</td><td>Del</td></tr>
+<tr><td>Máy bộ / mainboard rời (Gigabyte, ASRock...)</td><td>F12</td><td>Del</td></tr>
+</table>
+<p class="mu"><small>Nếu muốn USB luôn boot trước vĩnh viễn, vào BIOS và đổi thứ tự boot (Boot Order) đưa USB lên đầu — nhưng cách bấm phím boot menu mỗi lần an toàn hơn vì không ảnh hưởng việc khởi động bình thường sau này.</small></p>
+</div>
+
+<h2>Menu bạn sẽ thấy khi boot từ USB</h2>
+<pre id="menuprev">  CUU HO (Rescue)
+     ...
+  CAI WINDOWS (can ban quyen)
+     ...
+  CAI LINUX (mien phi / ma nguon mo)
+     ...
+  [Enter] khoi dong muc chon   [F1] tro giup   [F5] che do cong cu</pre>
+<p class="mu"><small>Trong menu, chọn ISO nào thì máy boot y như nhét đĩa gốc đó vào — tự vào trình cài Windows, trình cài Linux, hoặc môi trường cứu hộ tương ứng, không cần thao tác thêm. Windows cần key bản quyền để kích hoạt. Phiên bản/link trong danh mục là mẫu, hãy cập nhật và điền SHA256 trước khi dùng thật.</small></p>
+</div>
+
+<script>
+// ===== CẤU HÌNH: sửa danh mục tại đây =====
+// group: rescue|windows|linux|tools ; tier: free|lic ; src: nguồn đặc biệt (fido:11 = Microsoft, manual:URL = tải tay)
+const GROUPS={rescue:["Cứu hộ","01-Cuu-ho"],windows:["Cài Windows","02-Cai-Windows"],linux:["Cài Linux","03-Cai-Linux"],tools:["Tiện ích (chạy trong Windows)","04-Tien-ich"]};
+const CATALOG=[
+{id:"sysrescue",group:"rescue",name:"SystemRescue",ver:"12.00",gb:1.0,tier:"free",file:"systemrescue.iso",sha:"",tip:"Sua phan vung va khoi phuc du lieu",desc:"Bộ cứu hộ Linux tổng hợp: sửa phân vùng, khôi phục dữ liệu, đặt lại bootloader, dò mạng.",apps:["GParted","TestDisk","ddrescue","Firefox"]},
+{id:"gparted",group:"rescue",name:"GParted Live",ver:"1.6.0",gb:0.6,tier:"free",file:"gparted-live.iso",url:"https://downloads.sourceforge.net/gparted/gparted-live-1.6.0-3-amd64.iso",sha:"",tip:"Chia va sua phan vung o dia",desc:"Chia, gộp, resize, sửa lỗi phân vùng ổ đĩa.",apps:["GParted","TestDisk"]},
+{id:"clonezilla",group:"rescue",name:"Clonezilla Live",ver:"3.1.3",gb:0.6,tier:"free",file:"clonezilla.iso",url:"https://sourceforge.net/projects/clonezilla/files/clonezilla_live_stable/3.1.3-16/clonezilla-live-3.1.3-16-amd64.iso/download",sha:"",tip:"Sao luu va nhan ban o dia",desc:"Sao lưu/nhân bản ổ đĩa nguyên bản, dùng cho kỹ thuật viên.",apps:["Clonezilla","partclone"]},
+{id:"rescuezilla",group:"rescue",name:"Rescuezilla",ver:"2.5",gb:0.9,tier:"free",file:"rescuezilla.iso",url:"https://github.com/rescuezilla/rescuezilla/releases/latest",sha:"",tip:"Sao luu/phuc hoi o dia, giao dien de dung",desc:"Giống Clonezilla nhưng giao diện đồ họa dễ dùng hơn cho người không chuyên.",apps:["Rescuezilla","GParted"]},
+{id:"memtest",group:"rescue",name:"Memtest86+",ver:"7.20",gb:0.01,tier:"free",file:"memtest.zip",url:"https://memtest.org/download/v7.20/mt86plus_7.20_x86_64.iso.zip",sha:"",tip:"Kiem tra loi RAM",desc:"Kiểm tra lỗi thanh RAM khi máy hay treo/xanh màn hình.",apps:["Memtest86+"]},
+{id:"kaspersky",group:"rescue",name:"Kaspersky Rescue Disk",ver:"18",gb:1.2,tier:"free",file:"kasperskyrescue.iso",url:"https://support.kaspersky.com/14226",sha:"",tip:"Quet virus khi Windows khong vao duoc",desc:"Quét và diệt virus/ransomware ngay cả khi Windows bị khóa hoặc không khởi động được.",apps:["Kaspersky Rescue"]},
+{id:"supergrub",group:"rescue",name:"Super Grub2 Disk",ver:"2.06",gb:0.05,tier:"free",file:"supergrub2.iso",url:"https://sourceforge.net/projects/supergrub2/files/latest/download",sha:"",tip:"Sua loi khong vao duoc Windows/Linux do hong bootloader",desc:"Sửa lỗi mất bootloader khi cài song song Windows và Linux, máy báo lỗi không tìm thấy hệ điều hành.",apps:["Super Grub2"]},
+{id:"shredos",group:"rescue",name:"ShredOS",ver:"2024",gb:0.05,tier:"free",file:"shredos.iso",url:"https://github.com/PartialVolume/shredos.x86_64/releases/latest",sha:"",tip:"Xoa trang vinh vien o dia truoc khi thanh ly/ban may",desc:"Xóa trắng vĩnh viễn dữ liệu trên ổ đĩa trước khi thanh lý hoặc bán máy, không khôi phục lại được.",apps:["nwipe"]},
+{id:"hirens",group:"rescue",name:"Hiren's BootCD PE",ver:"1.0.8",gb:3.0,tier:"free",file:"hirens.iso",src:"manual:https://www.hirensbootcd.org/download/",link:"https://www.hirensbootcd.org/download/",sha:"",tip:"Bo cong cu Windows PE tong hop",desc:"Môi trường Windows PE kèm hàng loạt công cụ chẩn đoán, khôi phục tập tin, sửa registry. Tải thủ công từ trang gốc.",apps:["Chrome","7-Zip","CrystalDiskInfo","Explorer++"]},
+{id:"pwreset",group:"rescue",name:"Reset mật khẩu đăng nhập",ver:"chntpw",gb:0.3,tier:"free",file:"pogostick-chntpw.iso",url:"http://pogostick.net/~pnh/ntpasswd/pogostick-chntpw-250101.iso",sha:"",tip:"Xoa/dat lai mat khau local Windows - chi dung tren may cua ban",desc:"Xóa/đặt lại mật khẩu tài khoản Windows local khi quên, bằng cách sửa trực tiếp file SAM lúc máy tắt. Không reset được tài khoản Microsoft online. Chỉ dùng trên máy bạn sở hữu hoặc được phép truy cập.",apps:["chntpw"]},
+{id:"sdio",group:"tools",name:"Snappy Driver Installer Origin",ver:"R2410",gb:0.3,tier:"free",file:"sdio.zip",src:"manual:https://www.snappy-driver-installer.org/",link:"https://www.snappy-driver-installer.org/",sha:"",tip:"Tu quet va cai driver mang/am thanh/do hoa con thieu",desc:"Chạy sau khi đã vào được Windows (sau khi cài mới hoặc sau cứu hộ) để tự quét và cài driver mạng, âm thanh, card đồ họa còn thiếu. Nếu chưa có driver mạng, cắm dây LAN trước để công cụ tự tải gói driver phù hợp. Tải thủ công từ trang gốc vì gói driver cập nhật thường xuyên.",apps:["SDIO"]},
+{id:"win11",group:"windows",name:"Windows 11",ver:"mới nhất",gb:6.0,tier:"lic",file:"windows11.iso",src:"fido:11",link:"https://www.microsoft.com/software-download/windows11",sha:"",tip:"Cai Windows 11 - can key ban quyen",desc:"ISO chính thức từ Microsoft, cài rồi kích hoạt bằng key bản quyền của bạn.",apps:["Trình cài đặt Windows"]},
+{id:"win10",group:"windows",name:"Windows 10",ver:"22H2",gb:5.5,tier:"lic",file:"windows10.iso",src:"fido:10",link:"https://www.microsoft.com/software-download/windows10",sha:"",tip:"Cai Windows 10 - can key ban quyen",desc:"ISO chính thức từ Microsoft, cần key bản quyền để kích hoạt.",apps:["Trình cài đặt Windows"]},
+{id:"ubuntu",group:"linux",name:"Ubuntu 24.04 LTS",ver:"24.04",gb:6.0,tier:"free",file:"ubuntu.iso",url:"https://releases.ubuntu.com/24.04/ubuntu-24.04.3-desktop-amd64.iso",sha:"",tip:"Dung thu hoac cai Ubuntu",desc:"Dùng thử ngay từ USB hoặc cài lên máy, miễn phí và mã nguồn mở.",apps:["Firefox","LibreOffice","Disks"]},
+{id:"mint",group:"linux",name:"Linux Mint",ver:"22.1 Cinnamon",gb:3.0,tier:"free",file:"linuxmint.iso",url:"https://mirrors.edge.kernel.org/linuxmint/stable/22.1/linuxmint-22.1-cinnamon-64bit.iso",sha:"",tip:"Dung thu hoac cai Linux Mint",desc:"Giao diện quen thuộc cho người chuyển từ Windows, miễn phí và mã nguồn mở.",apps:["Firefox","LibreOffice","Timeshift"]}
+];
+const PRESETS=[
+ {id:"rescue",name:"Chỉ cứu hộ",desc:"Mọi công cụ cứu hộ: sửa phân vùng, khôi phục dữ liệu, diệt virus, reset mật khẩu, kiểm tra RAM, cộng công cụ cài driver mạng/âm thanh/đồ họa.",pick:c=>c.group==="rescue"||c.group==="tools"},
+ {id:"rescue_win",name:"Cứu hộ + Cài Windows",desc:"Đầy đủ công cụ cứu hộ + driver, cộng thêm bộ cài Windows 11 chính thức (cần key bản quyền).",pick:c=>c.group==="rescue"||c.group==="tools"||c.id==="win11"},
+ {id:"rescue_linux",name:"Cứu hộ + Cài Linux",desc:"Đầy đủ công cụ cứu hộ + driver, cộng thêm Ubuntu — cài hoặc dùng thử ngay, hoàn toàn miễn phí.",pick:c=>c.group==="rescue"||c.group==="tools"||c.id==="ubuntu"},
+ {id:"all",name:"Đầy đủ tất cả",desc:"Toàn bộ danh mục: cứu hộ, driver, Windows 11/10, Ubuntu, Linux Mint. USB nên từ 64 GB.",pick:c=>true}
+];
+/*TEMPLATES_START*/
+const TEMPLATES={ps1:"# Rescue Setup (Windows). Thuong duoc dong goi thanh rescue-setup.bat (bam dup la chay).\n# Neu muon chay truc tiep file .ps1 nay: powershell -ExecutionPolicy Bypass -File .\\rescue-setup.ps1\n$ErrorActionPreference='Stop'\n#__RESERVE__\nif(-not (Get-Variable ReserveMB -ErrorAction SilentlyContinue)){ $ReserveMB=0 }\n#__EMBED__\nif(-not $Conf){ $f=Join-Path $PSScriptRoot 'isos.conf'; if(Test-Path $f){$Conf=Get-Content $f -Raw}else{throw 'Thieu danh sach ISO.'} }\n$rows=$Conf -split \"`r?`n\" | Where-Object { $_.Trim() -and -not $_.StartsWith('#') } | ForEach-Object { $p=$_.Split('|'); [pscustomobject]@{Name=$p[0];Url=$p[1];Sha=$p[2];File=$p[3];Folder=$p[4];Tip=$p[5]} }\n$tmp=Join-Path $env:TEMP 'rescue-usb'; New-Item -ItemType Directory -Force $tmp | Out-Null\nWrite-Host '== Buoc 1: cai Ventoy len USB =='\n$rel=Invoke-RestMethod https://api.github.com/repos/ventoy/Ventoy/releases/latest\n$asset=$rel.assets | Where-Object name -like '*windows.zip' | Select-Object -First 1\n$zip=Join-Path $tmp $asset.name\nif(-not (Test-Path $zip)){ Invoke-WebRequest $asset.browser_download_url -OutFile $zip }\n$vdir=Join-Path $tmp 'ventoy'; if(Test-Path $vdir){Remove-Item $vdir -Recurse -Force}\nExpand-Archive $zip $vdir\n$exe=Get-ChildItem $vdir -Recurse -Filter Ventoy2Disk.exe | Select-Object -First 1\nWrite-Host 'Cua so Ventoy se mo. Chon DUNG USB.'\nif($ReserveMB -gt 0){\n  Write-Host \">> Truoc khi bam Install: tim o 'Reserve Space on disk (MB)' va nhap $ReserveMB roi moi bam Install.\" -ForegroundColor Yellow\n}else{\n  Write-Host 'Bam Install (se XOA SACH USB).'\n}\nWrite-Host 'Xong buoc cai dat hay dong cua so Ventoy.'\nStart-Process $exe.FullName -Wait\n$dl=(Read-Host 'Ky tu o USB (vi du E)').Trim(':').ToUpper()\n$vol=Get-Volume -DriveLetter $dl -ErrorAction SilentlyContinue\nif(-not $vol -or $vol.FileSystemLabel -ne 'Ventoy'){ throw \"O $dl khong phai USB Ventoy.\" }\n$root=\"${dl}:\\\"\nWrite-Host '== Buoc 2: tai ISO / tien ich =='\nforeach($r in $rows){\n  $dir=Join-Path $root $r.Folder; New-Item -ItemType Directory -Force $dir | Out-Null\n  $out=Join-Path $dir $r.File\n  if(Test-Path $out){ Write-Host \"Da co $($r.File)\"; continue }\n  $url=$r.Url\n  try{\n    if($url -like 'manual:*'){ throw \"Hay tai tay tai $($url.Substring(7)) va dat vao $dir\" }\n    if($url -like 'fido:*'){\n      $fido=Join-Path $tmp 'Fido.ps1'\n      if(-not (Test-Path $fido)){ Invoke-WebRequest https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1 -OutFile $fido }\n      $url=(& $fido -Win $url.Substring(5) -Rel Latest -Arch x64 -GetUrl | Select-Object -Last 1)\n    }\n    Write-Host \"==> $($r.Name)\"\n    & curl.exe -L --fail --retry 3 -C - -o \"$out.part\" $url\n    if($LASTEXITCODE -ne 0){ throw 'tai loi' }\n    if($r.Sha){ if((Get-FileHash \"$out.part\" -Algorithm SHA256).Hash -ne $r.Sha.ToUpper()){ Remove-Item \"$out.part\"; throw 'SHA256 sai' } }\n    Move-Item \"$out.part\" $out\n    # Chi giai nen zip neu la ISO dong goi (thu muc boot 01/02/03); thu muc tien ich 04- giu nguyen file goc.\n    if($out -like '*.zip' -and $r.Folder -notlike '04-*'){ Expand-Archive $out $dir -Force }\n  }catch{ Write-Warning \"Bo qua $($r.Name): $_\" }\n}\nWrite-Host '== Buoc 3: tao menu boot =='\n$alias=@(); $tips=@()\nforeach($r in $rows){ if($r.File -like '*.iso' -and (Test-Path (Join-Path $root \"$($r.Folder)\\$($r.File)\"))){ $img=\"/$($r.Folder)/$($r.File)\"; $alias+=@{image=$img;alias=$r.Name}; $tips+=@{image=$img;tip=$r.Tip} } }\n$dirs=@(@{dir='/01-Cuu-ho';alias='CUU HO (Rescue)'},@{dir='/02-Cai-Windows';alias='CAI WINDOWS (can ban quyen)'},@{dir='/03-Cai-Linux';alias='CAI LINUX (mien phi / ma nguon mo)'},@{dir='/04-Tien-ich';alias='TIEN ICH (mo trong Windows, khong boot)'})\n$cfg=[ordered]@{control=@(@{VTOY_DEFAULT_MENU_MODE='1'});menu_alias=@($dirs+$alias);menu_tip=[ordered]@{left='5%';top='90%';color='#00ff00';tips=@($tips)}}\nNew-Item -ItemType Directory -Force \"${root}ventoy\" | Out-Null\n[IO.File]::WriteAllText(\"${root}ventoy\\ventoy.json\",($cfg | ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding $false))\nif($ReserveMB -gt 0){\n  Write-Host '== Buoc 4: tao vung luu tru rieng =='\n  try{\n    $diskNum=(Get-Partition -DriveLetter $dl).DiskNumber\n    $dpFile=Join-Path $tmp 'storage.txt'\n    @\"\nselect disk $diskNum\ncreate partition primary\nformat fs=exfat quick label=Luutru\nassign\n\"@ | Set-Content $dpFile -Encoding ASCII\n    diskpart /s $dpFile | Out-Null\n    Write-Host 'Da tao vung luu tru rieng tren USB (nhan Luutru). Neu khong thay, mo Disk Management kiem tra vung chua cap phat con lai.'\n  }catch{ Write-Warning \"Khong tu tao duoc vung luu tru: $_. Mo Disk Management, tao thu cong tren vung chua cap phat cuoi dia.\" }\n}\nWrite-Host 'Xong! Khoi dong may tu USB de vao menu.'\n",sh:"#!/usr/bin/env bash\n# Rescue USB (Linux): cai Ventoy len USB, tai ISO/tien ich, chep vao thu muc phan loai, tao menu boot, tuy chon tao vung luu tru rieng.\nset -euo pipefail\nDIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")\" && pwd)\"\nCACHE=\"$DIR/.cache\"; CATALOG=\"$DIR/isos.conf\"; LOCAL_ISOS=\"$DIR/isos\"; GPT=0\n#__RESERVE__\nRESERVE_MB=\"${RESERVE_MB:-0}\"\n#__EMBED__\ndie(){ echo \"LOI: $*\" >&2; exit 1; }\nneed(){ command -v \"$1\" >/dev/null || die \"Thieu lenh '$1'.\"; }\nrows(){ { if [[ -n \"${EMBEDDED_CONF:-}\" ]]; then printf '%s\\n' \"$EMBEDDED_CONF\"; else cat \"$CATALOG\"; fi; } | grep -vE '^\\s*(#|$)' || true; }\nusage(){ cat <<U\nDung:\n  $0 list                        Liet ke USB\n  $0 install /dev/sdX [--gpt]    XOA SACH USB, cai Ventoy, tai + chep ISO/tien ich, tao menu\n  $0 sync /dev/sdX               Chi chep them ISO/tien ich + cap nhat menu (giu du lieu)\nISO/tien ich rieng: tha vao isos/<ten-thu-muc>/ (vd isos/02-Cai-Windows/win.iso) hoac isos/ (vao 04-Khac).\nBien RESERVE_MB (sua o dau file nay) de danh rieng dung luong cuoi USB lam o luu tru (exFAT).\nU\n}\nlist_usb(){ lsblk -dpno NAME,SIZE,MODEL,TRAN,RM | awk '$NF==1 || /usb/'; }\ncheck_dev(){\n  local d=\"$1\"; [[ -b \"$d\" ]] || die \"$d khong phai block device.\"\n  [[ \"$(lsblk -dno TYPE \"$d\")\" == disk ]] || die \"Hay chi dinh ca o (vd /dev/sdb).\"\n  local root; root=\"$(lsblk -no PKNAME \"$(findmnt -no SOURCE /)\" 2>/dev/null | head -1 || true)\"\n  if [[ -n \"$root\" && \"$d\" == \"/dev/$root\" ]]; then die \"$d la o he thong!\"; fi\n  [[ \"$(lsblk -dno RM \"$d\")\" == 1 || \"$(lsblk -dno TRAN \"$d\")\" == usb ]] || die \"$d khong phai USB. Tu choi.\"\n}\ndownload(){\n  need curl; local name url sha file folder tip out\n  while IFS='|' read -r name url sha file folder tip; do\n    mkdir -p \"$CACHE/iso/$folder\"; out=\"$CACHE/iso/$folder/$file\"\n    case \"$url\" in\n      fido:*|manual:*) echo \"==> $name: hay tai thu cong (${url#manual:}${url#fido:}) va dat vao isos/$folder/$file\"; continue;;\n    esac\n    if [[ ! -f \"$out\" ]]; then\n      echo \"==> Tai $name\"\n      if curl -L --fail --retry 3 -C - -o \"$out.part\" \"$url\"; then mv \"$out.part\" \"$out\"\n      else echo \"  ! Khong tai duoc $name, bo qua.\"; rm -f \"$out.part\"; continue; fi\n    fi\n    if [[ -n \"${sha// }\" ]]; then\n      echo \"$sha  $out\" | sha256sum -c - >/dev/null || { echo \"  ! SHA256 sai, xoa $file\"; rm -f \"$out\"; continue; }\n    fi\n    # Chi tu giai nen .zip neu ben trong la ISO (thu muc boot 01/02/03); thu muc tien ich (04-) giu nguyen file goc.\n    if [[ \"$out\" == *.zip && \"$folder\" != 04-* ]]; then need unzip; unzip -oq \"$out\" -d \"$CACHE/iso/$folder\"; fi\n  done < <(rows)\n}\ninstall_ventoy(){\n  local dev=\"$1\"; need curl; need tar; mkdir -p \"$CACHE\"\n  local url; url=\"$(curl -fsSL https://api.github.com/repos/ventoy/Ventoy/releases/latest | grep -o 'https://[^\"]*linux\\.tar\\.gz' | head -1)\" || true\n  [[ -n \"$url\" ]] || die \"Khong lay duoc link Ventoy.\"\n  [[ -f \"$CACHE/ventoy.tar.gz\" ]] || curl -L --fail -o \"$CACHE/ventoy.tar.gz\" \"$url\"\n  rm -rf \"$CACHE/_ventoy\"; mkdir \"$CACHE/_ventoy\"; tar -xzf \"$CACHE/ventoy.tar.gz\" -C \"$CACHE/_ventoy\" --strip-components=1\n  local flags=\"-I\"; [[ $GPT == 1 ]] && flags=\"-I -g\"\n  [[ \"$RESERVE_MB\" -gt 0 ]] && flags=\"$flags -r $RESERVE_MB\"\n  ( cd \"$CACHE/_ventoy\" && printf 'y\\ny\\n' | bash ./Ventoy2Disk.sh $flags \"$dev\" )\n}\nmake_storage(){\n  local dev=\"$1\"; [[ \"$RESERVE_MB\" -gt 0 ]] || return 0\n  need parted\n  if ! command -v mkfs.exfat >/dev/null; then\n    echo \"!! Thieu mkfs.exfat (cai goi 'exfatprogs' hoac 'exfat-utils') - bo qua tao vung luu tru, da danh san $RESERVE_MB MB trong dia nhung chua dinh dang.\"\n    return 0\n  fi\n  partprobe \"$dev\" 2>/dev/null || true; sleep 1\n  local last_end\n  last_end=\"$(parted -sm \"$dev\" unit MiB print 2>/dev/null | awk -F: '/^[0-9]+:/{gsub(\"MiB\",\"\",$3);end=$3} END{print end}')\"\n  [[ -n \"$last_end\" ]] || { echo \"!! Khong xac dinh duoc vung trong, bo qua tao vung luu tru (kiem tra bang GParted).\"; return 0; }\n  parted -s \"$dev\" unit MiB mkpart primary \"$last_end\" 100% || { echo \"!! Tao phan vung that bai, kiem tra bang GParted.\"; return 0; }\n  partprobe \"$dev\" 2>/dev/null || true; sleep 1\n  local newpart; newpart=\"$(lsblk -lnpo NAME,TYPE \"$dev\" | awk '$2==\"part\"{print $1}' | tail -1)\"\n  mkfs.exfat -n LUUTRU \"$newpart\" 2>/dev/null || mkfs.exfat -L LUUTRU \"$newpart\"\n  echo \"Da tao vung luu tru rieng: $newpart (exFAT, nhan LUUTRU, ~${RESERVE_MB} MB) - dung nhu USB thuong, khong bi Ventoy dong lai.\"\n}\nwrite_menu(){\n  local mnt=\"$1\" a=\"\" t=\"\" name url sha file folder tip\n  while IFS='|' read -r name url sha file folder tip; do\n    if [[ \"$file\" == *.iso && -f \"$mnt/$folder/$file\" ]]; then\n      a+=\"{\\\"image\\\":\\\"/$folder/$file\\\",\\\"alias\\\":\\\"$name\\\"},\"; t+=\"{\\\"image\\\":\\\"/$folder/$file\\\",\\\"tip\\\":\\\"$tip\\\"},\"\n    fi\n  done < <(rows)\n  local d='{\"dir\":\"/01-Cuu-ho\",\"alias\":\"CUU HO (Rescue)\"},{\"dir\":\"/02-Cai-Windows\",\"alias\":\"CAI WINDOWS (can ban quyen)\"},{\"dir\":\"/03-Cai-Linux\",\"alias\":\"CAI LINUX (mien phi / ma nguon mo)\"},{\"dir\":\"/04-Tien-ich\",\"alias\":\"TIEN ICH (mo trong Windows, khong boot)\"},'\n  mkdir -p \"$mnt/ventoy\"\n  printf '{\"control\":[{\"VTOY_DEFAULT_MENU_MODE\":\"1\"}],\"menu_alias\":[%s%s],\"menu_tip\":{\"left\":\"5%%\",\"top\":\"90%%\",\"color\":\"#00ff00\",\"tips\":[%s]}}\\n' \"$d\" \"${a%,}\" \"${t%,}\" > \"$mnt/ventoy/ventoy.json\"\n}\nsync_isos(){\n  local dev=\"$1\"; partprobe \"$dev\" 2>/dev/null || true; sleep 2\n  local part; part=\"$(lsblk -lnpo NAME,TYPE \"$dev\" | awk '$2==\"part\"{print $1}' | head -1)\"\n  [[ -n \"$part\" ]] || die \"Khong thay phan vung du lieu tren $dev.\"\n  local mnt; mnt=\"$(mktemp -d)\"; mount \"$part\" \"$mnt\" || die \"Khong mount duoc (can ho tro exFAT).\"\n  trap 'umount \"$mnt\" 2>/dev/null; rmdir \"$mnt\" 2>/dev/null' EXIT\n  shopt -s nullglob\n  local f fo\n  for f in \"$CACHE\"/iso/*/*; do [[ -f \"$f\" ]] || continue; fo=\"$(basename \"$(dirname \"$f\")\")\"; mkdir -p \"$mnt/$fo\"; echo \"==> $fo/$(basename \"$f\")\"; cp -u \"$f\" \"$mnt/$fo/\"; done\n  for f in \"$LOCAL_ISOS\"/*/*; do [[ -f \"$f\" ]] || continue; fo=\"$(basename \"$(dirname \"$f\")\")\"; mkdir -p \"$mnt/$fo\"; echo \"==> $fo/$(basename \"$f\")\"; cp -u \"$f\" \"$mnt/$fo/\"; done\n  for f in \"$LOCAL_ISOS\"/*; do [[ -f \"$f\" ]] || continue; mkdir -p \"$mnt/04-Khac\"; echo \"==> 04-Khac/$(basename \"$f\")\"; cp -u \"$f\" \"$mnt/04-Khac/\"; done\n  write_menu \"$mnt\"; sync; df -h \"$mnt\" | tail -1; echo \"Xong. Boot may tu USB de vao menu.\"\n}\ncmd=\"${1:-}\"; shift || true\ncase \"$cmd\" in\n  list) list_usb ;;\n  install|sync)\n    dev=\"${1:-}\"; [[ -n \"$dev\" ]] || { usage; exit 1; }; shift || true\n    [[ \"${1:-}\" == \"--gpt\" ]] && GPT=1\n    [[ $EUID -eq 0 ]] || die \"Chay bang sudo.\"\n    check_dev \"$dev\"; lsblk \"$dev\"\n    if [[ \"$cmd\" == install ]]; then\n      echo \"CANH BAO: toan bo du lieu tren $dev se bi XOA.\"\n      [[ \"$RESERVE_MB\" -gt 0 ]] && echo \"Se danh rieng ~${RESERVE_MB} MB cuoi USB lam o luu tru (exFAT, khong bi Ventoy ghi de).\"\n      read -rp \"Go dung ten thiet bi ($dev) de xac nhan: \" ans; [[ \"$ans\" == \"$dev\" ]] || die \"Huy.\"\n      download; install_ventoy \"$dev\"; make_storage \"$dev\"\n    fi\n    sync_isos \"$dev\" ;;\n  *) usage ;;\nesac\n"};
+/*TEMPLATES_END*/
+// ==========================================
+const $=id=>document.getElementById(id);const sel=new Set();let grp="all";
+let mirror="";try{mirror=localStorage.getItem("mirror")||""}catch(e){}
+$("mirror").value=mirror;$("mirror").placeholder="https://server-cua-ban.example.com/iso/";
+const isWin=/win/i.test(navigator.platform||navigator.userAgent||"");
+$("detected").textContent=isWin?"Windows":"Linux";
+const base=()=>{let m=$("mirror").value.trim();return m&&!m.endsWith("/")?m+"/":m};
+const dl=i=>i.link||(i.url&&base()?base()+i.file:i.url)||"#";
+const src=i=>i.src||(i.url&&base()?base()+i.file:i.url);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function presets(){
+ $("presets").innerHTML=PRESETS.map(p=>{
+  const items=CATALOG.filter(p.pick);
+  const gb=items.reduce((a,i)=>a+i.gb,0).toFixed(1);
+  return `<div class="card"><h3 style="margin:0 0 4px">${esc(p.name)}</h3>
+  <p class="mu" style="margin:0 0 8px">${esc(p.desc)}</p>
+  <p class="mu"><small>${items.length} mục · ~${gb} GB</small></p>
+  <button class="big" data-p="${p.id}">Tải bộ cài ngay</button></div>`;
+ }).join("");
+ $("presets").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  const p=PRESETS.find(x=>x.id===b.dataset.p);
+  sel.clear(); CATALOG.filter(p.pick).forEach(c=>sel.add(c.id));
+  grid(); out(); gen(isWin?"ps1":"sh");
+ });
+}
+function tabs(){
+ $("tabs").innerHTML=[["all","Tất cả"],...Object.entries(GROUPS).map(([k,v])=>[k,v[0]])].map(([k,t])=>`<button class="${grp===k?"on":""}" data-k="${k}">${t}</button>`).join("");
+ $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{grp=b.dataset.k;tabs();grid()});
+}
+function matches(i,q){
+ if(!q)return true;
+ q=q.toLowerCase();
+ return i.name.toLowerCase().includes(q)||i.desc.toLowerCase().includes(q)||i.apps.join(" ").toLowerCase().includes(q)||i.tip.toLowerCase().includes(q);
+}
+function grid(){
+ const q=($("q").value||"").trim();
+ const items=CATALOG.filter(i=>(grp==="all"||i.group===grp)&&matches(i,q));
+ $("grid").innerHTML=items.length?items.map(i=>`
+ <div class="card it"><label><input type="checkbox" data-id="${i.id}" ${sel.has(i.id)?"checked":""}> <h3>${esc(i.name)}</h3>
+ <span class="tag ${i.tier}">${i.tier==="free"?"MIỄN PHÍ / MỞ":"BẢN QUYỀN"}</span></label>
+ <div class="mu"><small>v${esc(i.ver)} · ~${i.gb} GB</small></div>
+ <p style="margin:6px 0">${esc(i.desc)}</p>
+ <div class="apps">${i.apps.map(a=>`<span>${esc(a)}</span>`).join("")}</div>
+ <a class="btn g" href="${esc(dl(i))}" target="_blank" rel="noopener">Nguồn tải</a></div>`).join("")
+ : `<div class="empty">Không tìm thấy mục nào khớp "${esc(q)}". Thử từ khóa khác.</div>`;
+ $("grid").querySelectorAll("input").forEach(c=>c.onchange=()=>{c.checked?sel.add(c.dataset.id):sel.delete(c.dataset.id);out()});
+}
+const chosen=()=>CATALOG.filter(i=>sel.has(i.id));
+const conf=()=>"# Tao boi Rescue USB Hub\n"+chosen().map(i=>[i.name,src(i),i.sha,i.file,GROUPS[i.group][1],i.tip].join("|")).join("\n")+"\n";
+function reserveGB(){
+ const v=$("reserve").value;
+ if(v==="custom"){const n=parseFloat($("reserveCustom").value);return n>0?n:0}
+ return parseFloat(v)||0;
+}
+function out(){
+ $("cnt").textContent=sel.size;$("tot").textContent=chosen().reduce((a,i)=>a+i.gb,0).toFixed(1);
+ $("gw").disabled=$("gl").disabled=!sel.size;
+ const byg=g=>chosen().filter(i=>i.group===g).map(i=>i.name).join(", ")||"(chưa chọn)";
+ const rsv=reserveGB();
+ $("menuprev").textContent=
+`  CUU HO (Rescue)\n     ${byg("rescue")}\n  CAI WINDOWS (can ban quyen)\n     ${byg("windows")}\n  CAI LINUX (mien phi / ma nguon mo)\n     ${byg("linux")}\n  TIEN ICH (mo trong Windows, khong boot)\n     ${byg("tools")}\n  [Enter] khoi dong muc chon   [F1] tro giup   [F5] che do cong cu`
+ +(rsv>0?`\n\n+ ${rsv} GB cuoi USB duoc dung rieng lam o luu tru (nhan LUUTRU), khong hien trong menu boot.`:"");
+}
+// Dong goi mot script PowerShell thanh 1 file .bat tu-giai-nen: bam dup la Windows
+// tu xin quyen Admin (UAC) va chay thang, khong can mo PowerShell hay go lenh gi.
+// Ky thuat: nhung noi dung .ps1 (dang base64, boc dinh dang PEM) vao cuoi file .bat;
+// .bat doc chinh no, tach phan base64 bang "more", giai ma bang "certutil -decode"
+// (co san tren moi Windows 7 tro len) ra 1 file .ps1 tam, roi chay file do.
+function utf8Bytes(str){ return new TextEncoder().encode(str); }
+function bytesToBase64(bytes){
+ let bin=""; for(let i=0;i<bytes.length;i++) bin+=String.fromCharCode(bytes[i]);
+ return btoa(bin);
+}
+function wrap76(b64){ return b64.match(/.{1,76}/g).join("\r\n"); }
+function buildBat(ps1Text){
+ const b64=wrap76(bytesToBase64(utf8Bytes(ps1Text)));
+ const lines=[
+"@echo off",
+"setlocal EnableDelayedExpansion",
+"title Rescue USB Setup",
+"net session >nul 2>&1",
+'if not "%errorlevel%"=="0" (',
+"  echo Dang xin quyen Administrator - hay bam Yes o cua so UAC hien len...",
+'  powershell -NoProfile -Command "Start-Process -FilePath \'%~f0\' -Verb RunAs"',
+"  exit /b",
+")",
+'cd /d "%~dp0"',
+'for /f "tokens=1 delims=:" %%L in (\'findstr /n /r "^::PAYLOAD::$" "%~f0"\') do set SKIP=%%L',
+'set "B64=%TEMP%\\rescue_%RANDOM%.b64"',
+'set "PS1=%TEMP%\\rescue_%RANDOM%.ps1"',
+'more +%SKIP% "%~f0" > "%B64%"',
+'certutil -decode "%B64%" "%PS1%" >nul',
+'del "%B64%"',
+"echo.",
+"echo Dang chay bo cai, cua so co the mo them - vui long doi...",
+"echo.",
+'powershell -NoProfile -ExecutionPolicy Bypass -File "%PS1%"',
+'del "%PS1%"',
+"echo.",
+"echo Hoan tat. Nhan phim bat ky de dong cua so nay.",
+"pause >nul",
+"exit /b",
+"::PAYLOAD::",
+"-----BEGIN CERTIFICATE-----",
+b64,
+"-----END CERTIFICATE-----"
+ ];
+ return lines.join("\r\n");
+}
+function gen(kind){
+ let t=TEMPLATES[kind];
+ const c=conf();
+ const mb=Math.round(reserveGB()*1024);
+ const emb=kind==="ps1"?"$Conf = @'\n"+c+"'@":"read -r -d '' EMBEDDED_CONF <<'CONF' || true\n"+c+"CONF";
+ const rsv=kind==="ps1"?("$ReserveMB = "+mb):("RESERVE_MB="+mb);
+ t=t.replace("#__RESERVE__",()=>rsv).replace("#__EMBED__",()=>emb);
+ const out=kind==="ps1"?buildBat(t):t;
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out],{type:"text/plain"}));
+ a.download=kind==="ps1"?"rescue-setup.bat":"rescue-usb.sh";a.click();
+}
+$("save").onclick=()=>{try{localStorage.setItem("mirror",$("mirror").value)}catch(e){}grid();};
+$("q").oninput=grid;
+$("clear").onclick=()=>{sel.clear();grid();out();};
+$("reserve").onchange=()=>{$("reserveCustom").style.display=$("reserve").value==="custom"?"inline-block":"none"};
+$("gw").onclick=()=>gen("ps1");$("gl").onclick=()=>gen("sh");
+presets();tabs();grid();out();
+</script>
+</body></html>
