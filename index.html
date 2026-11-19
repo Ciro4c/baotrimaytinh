@@ -89,7 +89,11 @@ nav{flex-wrap:wrap;overflow-x:visible}nav button{padding:8px 10px;font-size:13px
   <button onclick="show(8)"><b>Hoàn tác thay đổi</b><span>Xem lịch sử các lần chạy và khôi phục</span></button></div>
  <div class="grid2"><div id="res"></div><div id="dvov"></div></div>
  <details class="card"><summary>Kiểm tra kết nối tới máy khác / máy in mạng</summary>
+<<<<<<< HEAD
   <div class="row"><input type="text" id="rt" placeholder="IP hoặc tên máy, ví dụ 192.168.1.50" style="max-width:240px"><input type="text" id="ru" placeholder="Tài khoản (nếu có)" style="max-width:160px"><input type="password" id="rpw" placeholder="Mật khẩu" style="max-width:120px"><button class="b onag" id="rmNow" hidden>Kiểm tra</button><button class="g offag" id="rm">Tải bản chạy thủ công</button></div>
+=======
+  <div class="row"><input type="text" id="rt" placeholder="IP hoặc tên máy, ví dụ 192.168.1.50" style="max-width:300px"><button class="b onag" id="rmNow" hidden>Kiểm tra</button><button class="g offag" id="rm">Tải bản chạy thủ công</button></div>
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
   <pre id="rout" hidden></pre></details>
  <details class="card offag"><summary>Không muốn cài trợ lý? Quét thủ công</summary>
   <p class="mu">Tải script kiểm tra, chạy bằng quyền Admin, rồi nạp kết quả vào đây.</p><button class="b" id="dlChk">Tải KiemTra_May.bat</button>
@@ -140,7 +144,11 @@ nav{flex-wrap:wrap;overflow-x:visible}nav button{padding:8px 10px;font-size:13px
  <button class="g" data-p="1">An toàn</button><button class="g" data-p="2">Cân bằng</button><button class="g" data-p="3">Tối đa</button><button class="g" data-p="0">Bỏ chọn</button></div>
  <div id="lo"></div></div></section>
 <section id="sK"><div class="card"><h2>Nút tắt và khởi động nhanh</h2><p class="mu">Tạo biểu tượng ngoài Desktop để bấm đúp là chạy. Muốn gỡ: xóa biểu tượng hoặc khôi phục ở tab Khôi phục.</p><div id="lks"></div></div></section>
+<<<<<<< HEAD
 <section id="s3"><div class="card"><h2>Dò máy khác trong mạng đang chia sẻ gì</h2><div class="row onag" hidden><button class="b" id="shsGo">Dò mạng</button><input type="text" id="shx" placeholder="Dải mạng thêm, ví dụ 192.168.1" style="max-width:200px"><input type="text" id="shu" placeholder="Tài khoản máy kia (nếu có)" style="max-width:190px"><input type="password" id="shp" placeholder="Mật khẩu" style="max-width:130px"></div><p class="mu" style="font-size:13px;margin:4px 0">Windows mới thường chặn xem share nếu không đăng nhập: nhập tài khoản/mật khẩu của máy kia. Máy ở dải mạng khác (router khác): nhập dải vào ô “Dải mạng thêm”.</p><span class="offag mu">Cần kết nối trợ lý.</span><div id="shsR"></div></div>
+=======
+<section id="s3"><div class="card"><h2>Dò máy khác trong mạng đang chia sẻ gì</h2><div class="row onag" hidden><button class="b" id="shsGo">Dò mạng</button><span class="mu">Tìm máy cùng Wi-Fi/LAN có cổng chia sẻ 445 và liệt kê thư mục/máy in đang share</span></div><span class="offag mu">Cần kết nối trợ lý.</span><div id="shsR"></div></div>
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
  <div class="card"><h2>Máy khác không thấy thư mục chia sẻ?</h2><div class="row onag" hidden><button class="b" id="shdGo">Chẩn đoán chia sẻ</button></div><span class="offag mu">Cần kết nối trợ lý.</span><div id="shdR"></div></div>
 <div class="card"><h2>Share đang có trên máy</h2><div class="row onag" hidden><button class="g" id="shRef">Làm mới từ máy này</button></div><div id="shList" class="mu">Chạy kiểm tra ở tab 1 để xem danh sách (gỡ share, sửa quyền, copy đường dẫn). Bạn vẫn tạo được share mới bên dưới mà không cần kiểm tra.</div></div>
 <div class="card"><h2>Tạo thư mục / chia sẻ mới</h2>
@@ -682,6 +690,7 @@ function analyzeSw(D){LIVE.sw=D;const Rw=[],f=(l,t,o)=>Rw.push(Object.assign({l,
  if(D.proxy)f('wn',`Proxy đang bật (${D.proxy}): có thể chặn kết nối tới máy in/thư mục nội bộ.`,{fx:{ps:"Reg 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings' 'ProxyEnable' 0 DWord",t:'tắt proxy',warn:'Nếu proxy do cơ quan bắt buộc, tắt có thể mất Internet (bật lại được bằng Hoàn tác).'}});
  if(D.hosts>5)f('wn',`Tệp hosts có ${D.hosts} dòng cấu hình: kiểm tra có dòng nào chặn hoặc trỏ sai tên máy nội bộ.`,{act:{l:'Mở tệp hosts',ps:'Start-Process notepad.exe "$env:SystemRoot\\System32\\drivers\\etc\\hosts"'}});
  const pn=D.printers||[],base=n=>n.replace(/\s*(\(Copy \d+\)|\(bản sao[^)]*\)|- Copy|\(\d+\))$/i,'').trim().toLowerCase(),seen={},dup=[];pn.forEach(n=>{const b=base(n);if(seen[b])dup.push(n);seen[b]=1});
+<<<<<<< HEAD
  if(dup.length)f('wn',`Máy in trùng/bản sao: ${dup.join(', ')}. Dễ in nhầm hoặc kẹt hàng đợi.`,{fx:{ps:dup.map(n=>`Remove-Printer -Name ${q(n)} -EA 0;L ${q('  da xoa may in '+n)}`).join('\n'),t:'xóa '+dup.join(', '),warn:'Xóa máy in trùng (không hoàn tác tự động).'}});
  if(pn.filter(n=>/pdf/i.test(n)).length>2)f('wn',`Có ${pn.filter(n=>/pdf/i.test(n)).length} máy in PDF ảo: dễ nhầm và xung đột khi in. Giữ 1 cái.`,{act:APPS});
  if(!Rw.some(x=>x.l!=='ok'))f('ok','Không phát hiện xung đột phần mềm đáng kể.');
@@ -692,6 +701,17 @@ function analyzeSw(D){LIVE.sw=D;const Rw=[],f=(l,t,o)=>Rw.push(Object.assign({l,
  sw.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{const x=Rw[+b.dataset.x];dvRun(x.fx.ps,'Đang xử lý xung đột',{warn:'Xử lý: '+x.fx.t+(x.fx.warn?'\n\n⚠ '+x.fx.warn:'')+'\n\nHoàn tác được ở tab Khôi phục (trừ xóa máy in).'})});
  sw.querySelectorAll('[data-ac]').forEach(b=>b.onclick=()=>{const [i,k]=b.dataset.ac.split(':'),a=Rw[+i].acts[+k];dvRun(a.ps,'Đang mở trình gỡ',{rp:false,warn:a.warn+' Tiếp tục?'})});
  if($('#swAll'))$('#swAll').onclick=()=>{const L=Rw.filter(x=>x.fx);dvRun(L.map(x=>x.fx.ps).join('\n'),'Đang xử lý xung đột',{warn:'Xử lý '+L.length+' mục:\n• '+L.map(x=>x.fx.t).join('\n• ')+(L.some(x=>x.fx.warn)?'\n\n⚠ '+L.filter(x=>x.fx.warn).map(x=>x.fx.warn).join('\n⚠ '):'')+'\n\nHoàn tác được ở tab Khôi phục (trừ xóa máy in). Tiếp tục?'})}}
+=======
+ if(dup.length)f('wn',`Máy in trùng/bản sao: ${dup.join(', ')}. Dễ in nhầm hoặc kẹt hàng đợi.`,[],null,{ps:dup.map(n=>`Remove-Printer -Name ${q(n)} -EA 0;L ${q('  da xoa may in '+n)}`).join('\n'),t:'Xóa '+dup.join(', '),warn:'Xóa máy in trùng (không hoàn tác tự động). Tiếp tục?'});
+ if(pn.filter(n=>/pdf/i.test(n)).length>2)f('wn',`Có ${pn.filter(n=>/pdf/i.test(n)).length} máy in PDF ảo: dễ nhầm và xung đột khi in. Giữ 1 cái.`,[],APPS);
+ if(!Rw.some(x=>x[0]!=='ok'))f('ok','Không phát hiện xung đột phần mềm đáng kể.');
+ LASTSW=Rw.map(x=>x[1]);const c={ok:0,wn:0,bd:0};Rw.forEach(x=>c[x[0]]++);
+ $('#swRes').innerHTML=`<div class="card"><h2>Kết quả: ${c.bd} xung đột nghiêm trọng · ${c.wn} cần lưu ý · ${c.ok} bình thường</h2>${Rw.map((x,i)=>`<div class="f ${x[0]}">${x[4]?`<input type="checkbox" data-x="${i}" title="Chọn để sửa" style="width:18px;height:18px">`:''}<b>${{ok:'Tốt',wn:'Lưu ý',bd:'Xung đột'}[x[0]]}</b><span style="flex:1">${esc(x[1])}${x[4]?`<br><small class="mu">Sửa: ${esc(x[4].t||'')}</small>`:''}</span>${x[2].length?`<button class="g" data-i="${i}" data-k="f">Sửa</button>`:''}${x[3]&&AG.ok?`<button class="g" data-i="${i}" data-k="a">${esc(x[3].l)}</button>`:''}${x[0]!=='ok'?`<button class="g" data-ai="${i}">Hỏi AI</button>`:''}</div>`).join('')}${Rw.some(x=>x[4])?'<div class="row"><button class="b" id="swFix">Sửa các mục đã tick</button><button class="g" id="swAll">Tick tất cả</button><span class="mu">Mọi thay đổi hoàn tác được (trừ xóa máy in trùng).</span></div>':''}</div>`;
+ $('#swRes').querySelectorAll('[data-ai]').forEach(b=>b.onclick=()=>aiHelp(Rw[+b.dataset.ai][1],''));
+ $('#swRes').querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>{const x=Rw[+b.dataset.i];if(b.dataset.k==='f')runItems(x[2].map(id=>FIXI.concat(OPT,CLI,KSI).find(y=>y.id===id)).filter(Boolean));else ag('/run',x[3].ps,20000).catch(e=>alert(e.message))});
+ if($('#swAll'))$('#swAll').onclick=()=>$('#swRes').querySelectorAll('input[data-x]').forEach(c=>c.checked=true);
+ if($('#swFix'))$('#swFix').onclick=()=>{const L=[...$('#swRes').querySelectorAll('input[data-x]:checked')].map(c=>Rw[+c.dataset.x][4]);if(!L.length){alert('Chưa tick mục nào.');return}const w=L.map(x=>x.warn).filter(Boolean);dvRun(L.map(x=>x.ps).join('\n'),'Đang sửa xung đột',{warn:'Sửa '+L.length+' mục:\n• '+L.map(x=>x.t).join('\n• ')+(w.length?'\n\n⚠ '+w.join('\n⚠ '):'')+'\n\nTiếp tục?'})}}
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 async function runSw(){$('#swRes').innerHTML='<div class="card"><b>Đang kiểm tra xung đột… (khoảng 20–60 giây)</b></div>';try{const t=await ag('/run',SWC+"\n'@@JSON@@'+$j",180000),i=t.lastIndexOf('@@JSON@@');if(i<0)throw new Error(t.slice(-300));analyzeSw(JSON.parse(t.slice(i+8).trim()))}catch(e){$('#swRes').innerHTML='<div class="card f bd"><b>Lỗi</b><span>'+esc(e.message)+'</span></div>'}}
 $('#swRun').onclick=runSw;
 $('#swDl').onclick=()=>save('KiemTra_XungDot.bat',SWC+R`
@@ -756,7 +776,10 @@ function DevRm($id){pnputil /remove-device $id|Out-Null;L "  da go thiet bi $id 
 function NoRun($pat){foreach($x in @(@('HKCU:\Software\Microsoft\Windows\CurrentVersion\Run','HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run'),@('HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run','HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run'))){if(Test-Path $x[0]){$k=Get-Item $x[0];foreach($n in $k.GetValueNames()){if($n -and (("$n "+$k.GetValue($n)) -match $pat)){Reg $x[1] $n ([byte[]](3,0,0,0,0,0,0,0,0,0,0,0)) Binary;L "  tat tu chay: $n"}}}}}
 function NetOff($n){Undo (('Enable-NetAdapter -Name ''X'' -Confirm:$false').Replace('X',$n));Disable-NetAdapter -Name $n -Confirm:$false -EA 0;L "  da tat card mang $n"}
 function StopP($n){Get-Process -Name $n -EA 0|Stop-Process -Force -EA 0;L "  da dung tien trinh $n"}
+<<<<<<< HEAD
 function UnInst($n){$f=$false;foreach($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*','HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*','HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'){if($f){break};Get-ItemProperty $k -EA 0|?{$_.DisplayName -like ('*'+$n+'*') -and $_.UninstallString}|Select-Object -First 1|%{$f=$true;L ('  mo trinh go cai dat: '+$_.DisplayName);Start-Process cmd.exe -ArgumentList ('/c "'+$_.UninstallString+'"')}};if(!$f){L ('  khong tim thay '+$n+' - mo Ung dung da cai dat');Start-Process 'ms-settings:appsfeatures'}}
+=======
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 function TskOn($re){Get-ScheduledTask -EA 0|?{$_.TaskName -match $re -and $_.State -eq 'Disabled'}|%{Undo ("Disable-ScheduledTask -TaskPath '"+$_.TaskPath+"' -TaskName '"+$_.TaskName+"'|Out-Null");Enable-ScheduledTask -TaskPath $_.TaskPath -TaskName $_.TaskName|Out-Null;L ("  bat lai tac vu "+$_.TaskName)}}
 `;
 const RPJ="try{$j=Start-Job {Checkpoint-Computer -Description BaoTri -RestorePointType MODIFY_SETTINGS -EA Stop -WarningAction SilentlyContinue};if(Wait-Job $j -Timeout 25){L 'Da tao diem khoi phuc'}else{Stop-Job $j;L 'Bo qua diem khoi phuc (qua lau)'};Remove-Job $j -Force -EA 0}catch{L 'Khong tao duoc diem khoi phuc (bo qua)'}\n";const DRP=RPJ;
@@ -857,12 +880,21 @@ function dvAnalyze(X){DV=X;DISS=[];const dev=X.dev||[],dr=X.dr||[],ph=[],ev=X.ev
  if(X.wuex===1)DISS.push({sev:'wn',cat:'ev',k:'wuex',t:'Windows bị chặn tự cập nhật driver',sub:'Chính sách ExcludeWUDriversInQualityUpdate = 1',mean:'Windows Update sẽ không tự cài driver.',steps:['Muốn nhận driver qua Windows Update: bỏ chính sách này.','Máy công ty: hỏi bộ phận IT.']});
  if(ph.length)DISS.push({sev:'ok',cat:'dev',k:'info',t:`${ph.length} thiết bị không kết nối (bình thường)`,sub:'Mã 24/45/47 – thiết bị đã rút',mean:'Windows còn nhớ thiết bị từng cắm.',steps:['Có thể bỏ qua.'],rows:ph.map(x=>({n:x.n,v:'mã '+x.e,d:'',p:fri(x.c)}))});
  DISS.forEach(i=>{if(i.dev&&i.dev.id)i.btns=()=>dvBtns(i);else if(i.cat!=='dev')i.btns=()=>evBtns(i)});dvRender()}
+<<<<<<< HEAD
 function dvBtns(it){const x=it.dev,hw=(x.h&&x.h[0])||'',hl=(x.h&&x.h.length?x.h:[hw,x.id]).filter(Boolean),out=[];
  if(it.k==='dis')out.push(dvBt('Bật thiết bị',()=>dvAct('DevEn',x,'Bật thiết bị'),'b'));else{out.push(dvBt('Tải và cài driver',()=>dvAutoInstall(hl,x.n||it.t),'b'));if(x.id&&it.k!=='miss')out.push(dvBt('Khởi động lại thiết bị',()=>dvAct('DevRs',x,'Khởi động lại thiết bị')))}
  const d=dvEl('details',''),r=dvEl('div','row');d.innerHTML='<summary>Cách khác</summary>';
  if(hw)r.append(dvLk(CAT+encodeURIComponent(hw.replace(/&(SUBSYS|REV|MI)_.*$/i,'')),'Microsoft Catalog'));
  const v=vend(hw||x.id)||(DV.sys?mkL(DV.sys):null);if(v)r.append(dvLk(v[1],'Trang '+v[0]));if(hw)r.append(dvBt('Copy Hardware ID',()=>navigator.clipboard.writeText(hw)));
  if(it.k==='dis')r.append(dvBt('Tải và cài driver',()=>dvAutoInstall(hl,x.n||it.t)));if(x.id&&!CRIT.test(x.c||''))r.append(dvBt('Gỡ và cài lại',()=>dvAct('DevRm',x,'Gỡ và cài lại thiết bị',1)));d.append(r);out.push(d);return out}
+=======
+function dvBtns(it){const x=it.dev,out=[],hw=(x.h&&x.h[0])||'';out.push(dvBt('Tìm trên Windows Update',()=>{show(2);wuSearch()}));
+ if(hw)out.push(dvLk(CAT+encodeURIComponent(hw.replace(/&(SUBSYS|REV|MI)_.*$/i,'')),'Microsoft Catalog'));
+ const v=vend(hw||x.id)||(DV.sys?mkL(DV.sys):null);if(v)out.push(dvLk(v[1],'Trang '+v[0]));
+ if(x.id){out.push(it.k==='dis'?dvBt('Bật thiết bị',()=>dvAct('DevEn',x,'Bật thiết bị'),'b'):dvBt('Khởi động lại thiết bị',()=>dvAct('DevRs',x,'Khởi động lại thiết bị'),'b'));
+  if(!CRIT.test(x.c||''))out.push(dvBt('Gỡ và cài lại',()=>dvAct('DevRm',x,'Gỡ và cài lại thiết bị',1)))}
+ return out}
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 const dvAct=(fn,x,t,d)=>dvRun(`${fn} ${q(x.id)}\npnputil /scan-devices|Out-Null`,t,{warn:d?`Gỡ “${x.n}” rồi quét lại phần cứng để Windows tự cài lại driver? Màn hình/mạng có thể gián đoạn vài giây.`:`${t} cho “${x.n}”?`});
 function dvCard(it){const w=dvEl('div','ic2 '+it.sev),kv=(l,v,c,tt)=>v?`<div class="kv ${c||''}"><b>${l}</b><span title="${esc(tt||'')}">${v}</span></div>`:'';
  let h=`<b class="ti">${esc(it.t)}</b><small class="mu">${esc(it.sub||'')}</small>`+kv('Ý nghĩa',esc(it.mean||''),'',it.cause)+(it.steps?kv('Cách sửa','<ol>'+it.steps.slice(0,3).map(s=>`<li>${esc(s)}</li>`).join('')+'</ol>','l1'):'');
@@ -882,6 +914,7 @@ function dvHw(){const h=$('#dvhw'),s=DV.sys||{},m=mkL(s);h.innerHTML=`<table cla
   const tb=dvEl('table','tb');tb.innerHTML=`<tr><th colspan="5">${t}</th></tr>`;L.slice(0,25).forEach(x=>{const age=x.d?(Date.now()-new Date(x.d))/31557600000:0,tr=dvEl('tr'),hw=(x.h||'').replace(/&(SUBSYS|REV|MI)_.*$/i,''),v=vend(x.h||x.id);
    tr.innerHTML=`<td>${esc(x.n)}</td><td>${esc(x.v||'')}</td><td>${esc(x.d||'')}${OLD[c]&&age>OLD[c]&&!/microsoft/i.test(x.p||'')?' <span class="age">cũ</span>':''}</td><td>${esc(x.p||x.m||'')}${x.s===false?' <span class="age">chưa ký</span>':''}</td><td></td>`;const td=tr.lastChild;if(hw)td.append(dvLk(CAT+encodeURIComponent(hw),'Catalog'));if(v)td.append(' ',dvLk(v[1],v[0]));tb.append(tr)});
   const w=dvEl('div');w.style.overflowX='auto';w.append(tb);h.append(w)})}
+<<<<<<< HEAD
 const nh=z=>String(z||'').toLowerCase().replace(/&(subsys|rev|mi)_.*$/,''),wuHw=()=>new Set([...((DV&&DV.dev)||[]).flatMap(x=>(x.h||[]).map(nh)),...DISS.filter(i=>i.cat==='old').flatMap(i=>i.rows.map(r=>nh(r.h)))]);
 const WCL={display:'Màn hình có thể nháy vài giây khi cài',net:'Mất mạng vài giây khi cài',media:'Có thể phải chọn lại thiết bị phát',bluetooth:'Có thể phải ghép đôi lại',system:'Nên khởi động lại ngay sau khi cài',firmware:'Không được tắt nguồn khi đang cài'};
 async function wuFetch(){const t=await ag('/run',WUS,900000),i=t.lastIndexOf('@@JSON@@');WU=JSON.parse(t.slice(i+8).trim());return WU}
@@ -897,6 +930,18 @@ async function dvAutoInstall(hws,title){if(!AG.ok){alert('Cần kết nối tr�
  dlg.close();if(!confirm('Tìm thấy '+m.length+' driver cho “'+title+'”:\n• '+m.map(u=>u.t).join('\n• ')+'\n\nTải và cài ngay? (driver hiện tại và điểm khôi phục được sao lưu trước)'))return;
  dvRun(BKL+'\n'+WUI(m.map(u=>u.id)),'Đang tải và cài driver',{rp:true})}
 $('#wuGo').onclick=()=>wuSearch();$('#dvAuto').onclick=()=>wuSearch(true);
+=======
+async function wuSearch(){if(!AG.ok){alert('Cần kết nối trợ lý (tab Tổng quan).');return}const r=$('#wuR');r.innerHTML='<p class="mu">Đang tìm driver trên Windows Update… (30–120 giây)</p>';
+ try{const t=await ag('/run',WUS,900000),i=t.lastIndexOf('@@JSON@@');WU=JSON.parse(t.slice(i+8).trim());renderWu()}catch(e){r.innerHTML='<div class="f bd"><b>Lỗi</b><span>'+esc(e.message)+'</span></div>'}}
+const WCL={display:['Hiển thị tốt hơn, sửa lỗi đồ họa.','Màn hình có thể nháy vài giây khi cài.'],net:['Mạng/Wi-Fi ổn định hơn.','Mất mạng vài giây khi cài.'],media:['Sửa lỗi mất tiếng, rè, micro.','Có thể phải chọn lại thiết bị phát.'],bluetooth:['Bluetooth ổn định hơn.','Có thể phải ghép đôi lại.'],system:['Sửa lỗi chipset/nguồn.','Nên khởi động lại ngay sau khi cài.'],firmware:['Cập nhật firmware.','Không được tắt nguồn khi đang cài.']};
+function renderWu(){const r=$('#wuR');if(!WU.length){r.innerHTML='<div class="f ok"><b>Tốt</b><span>Windows Update không còn driver mới cho máy này. Nếu vẫn lỗi, thử Microsoft Catalog hoặc trang hãng.</span></div>';return}
+ const nh=z=>String(z||'').toLowerCase().replace(/&(subsys|rev|mi)_.*$/,''),hws=new Set([...((DV&&DV.dev)||[]).flatMap(x=>(x.h||[]).map(nh)),...DISS.filter(i=>i.cat==='old').flatMap(i=>i.rows.map(r=>nh(r.h)))]);
+ r.innerHTML=`<p><b>${WU.length} driver mới.</b> Mục khớp thiết bị đang lỗi hoặc driver cũ được tick sẵn.</p>${DISS.some(i=>i.cat==='old')&&!WU.some(u=>u.h&&hws.has(nh(u.h)))?'<div class="f wn"><b>Lưu ý</b><span>Windows Update chưa có bản mới cho các driver cũ. Dùng nút Catalog/trang hãng ở thẻ “driver đã cũ”, tải về rồi cài bằng “Cài từ thư mục”.</span></div>':''}`+WU.map((u,i)=>{const hit=u.h&&hws.has(nh(u.h)),c=WCL[String(u.c).toLowerCase()]||['Bản driver mới hơn.','Chưa được thử trên máy bạn.'];
+  return `<div class="ic2 ${hit?'bd':'ok'}"><label class="it"><input type="checkbox" data-i="${i}" ${hit?'checked':''}><span class="t"><b class="ti">${esc(u.t)}</b><small>${esc(u.c)} · ${esc(u.m)} · ${esc(u.dt)} · ${u.mb} MB${hit?' · <b style="color:var(--bd)">khớp thiết bị lỗi</b>':''}</small><span class="kv"><b>Hiệu quả</b><span>${esc(c[0])}</span></span><span class="kv l2"><b>Rủi ro: Vừa</b><span>${esc(c[1])}</span></span></span></label></div>`}).join('')+
+ `<div class="row"><label><input type="checkbox" id="wuBk" checked> Sao lưu driver hiện tại trước</label><button class="b" id="wuIn">Cài các driver đã tick</button></div>`;
+ $('#wuIn').onclick=()=>{const ids=[...r.querySelectorAll('input[data-i]:checked')].map(c=>WU[+c.dataset.i].id);if(!ids.length){alert('Hãy tick ít nhất một driver.');return}dvRun(($('#wuBk').checked?BKL+'\n':'')+WUI(ids),'Đang cài driver',{warn:`Cài ${ids.length} driver NGAY? Điểm khôi phục được tạo trước; nên khởi động lại máy sau đó.`})}}
+$('#wuGo').onclick=wuSearch;
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 $('#dInst').onclick=()=>{const p=$('#dpath').value.trim();if(!p){alert('Nhập thư mục chứa driver (.inf).');return}dvRun(BKL+'\n'+`if(Test-Path -LiteralPath ${q(p)}){pnputil /add-driver (Join-Path ${q(p)} '*.inf') /subdirs /install}else{L '  khong thay thu muc'}`,'Đang cài driver',{warn:'Cài driver từ “'+p+'”? Chỉ cài driver chính hãng đúng thiết bị; driver hiện tại được sao lưu trước.'})};
 $('#bkNow').onclick=async()=>{await dvRun(BKL,'Đang sao lưu driver',{rp:false});loadBk()};
 async function loadBk(){try{const t=await ag('/run',BKS,60000),L=t.split('\n').filter(x=>x.startsWith('@@B@@')).map(x=>x.slice(5).trim().split('|'));
@@ -1164,8 +1209,13 @@ async function shdDiag(){const h=$('#shdR');h.innerHTML='<p class="mu">Đang ki�
  P.fwP>0?g.push(ck('ok','Tường lửa cho phép “Chia sẻ tệp và máy in”')):(g.push(ck('bd','Tường lửa đang chặn “Chia sẻ tệp và máy in”')),fx.add('N2'));
  P.fwD>0?g.push(ck('ok','Tường lửa cho phép Network Discovery')):(g.push(ck('wn','Network Discovery đang tắt – máy khác không thấy tên máy trong mục Network, nhưng vẫn vào được bằng \\\\IP')),fx.add('N2'));
  P.fd==='Running'?g.push(ck('ok','Dịch vụ phát hiện (FDResPub) đang chạy')):(g.push(ck('wn','Dịch vụ FDResPub không chạy – máy không tự hiện trong Network')),fx.add('N1'));
+<<<<<<< HEAD
  (P.shares||[]).length?P.shares.forEach(s=>g.push(ck(s.ok?'ok':'bd','Share “'+s.n+'” → '+s.p+(s.ok?'':' (thư mục không còn tồn tại)')+' · đường dẫn: '+uncP((P.ip||[])[0]||'IP-MAY',s.n)))):g.push(ck('wn','Chưa có thư mục nào được chia sẻ trên máy này'));
  const ids=[...fx];h.innerHTML=g.join('')+`<div class="row">${ids.length?`<button class="b" id="shdFix">Sửa các lỗi tìm thấy (${ids.join(', ')})</button>`:''}<button class="g" id="shdAi">Hỏi AI</button></div><p class="mu" style="font-size:13px">Hai máy khác dải mạng (ví dụ 192.168.0.x và 192.168.1.x, thường do 2 router) thì tên máy/Network sẽ không hiện: hãy nối cùng một router hoặc gõ thẳng địa chỉ. Máy khác vẫn không thấy? Thử gõ thẳng <code>${uncP((P.ip||[])[0]||'IP-MAY','').slice(0,-1)}</code> vào Explorer của máy kia; kiểm tra hai máy cùng Wi-Fi/dải mạng và router không bật “AP isolation / cách ly máy khách”.</p>`;
+=======
+ (P.shares||[]).length?(P.shares.forEach(s=>g.push(ck(s.ok?'ok':'bd',`Share “${s.n}” → ${s.p}${s.ok?'':' (thư mục không còn tồn tại)'} · đường dẫn: \\${(P.ip||[])[0]||'IP-MAY'}\${s.n}`)))):g.push(ck('wn','Chưa có thư mục nào được chia sẻ trên máy này'));
+ const ids=[...fx];h.innerHTML=g.join('')+`<div class="row">${ids.length?`<button class="b" id="shdFix">Sửa các lỗi tìm thấy (${ids.join(', ')})</button>`:''}<button class="g" id="shdAi">Hỏi AI</button></div><p class="mu" style="font-size:13px">Máy khác vẫn không thấy? Thử gõ thẳng <code>\\${(P.ip||[])[0]||'IP-MAY'}</code> vào Explorer của máy kia; kiểm tra hai máy cùng Wi-Fi/dải mạng và router không bật “AP isolation / cách ly máy khách”.</p>`;
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
  if($('#shdFix'))$('#shdFix').onclick=()=>runItems(ids.map(id=>FIXI.find(y=>y.id===id)).filter(Boolean));$('#shdAi').onclick=()=>aiHelp('Máy khác không thấy thư mục chia sẻ','Server '+P.srv+'; 445 '+(P.listen?'mở':'đóng')+'; mạng '+((P.prof||[]).map(x=>x.c).join(','))+'; tường lửa chia sẻ '+P.fwP+'; discovery '+P.fwD)}catch(e){h.innerHTML='<div class="f bd"><b>Lỗi</b><span>'+esc(e.message)+'</span></div>'}}
 $('#shdGo').onclick=shdDiag;
 /* ---------- cập nhật tự động: tắt sâu / mở lại ---------- */
@@ -1221,7 +1271,11 @@ $('#hCool').onclick=()=>dvRun(PW_COOL,'Đang bật làm mát chủ động',{rp:
 $('#hBal').onclick=()=>dvRun(PW_BAL,'Đang đổi chế độ nguồn',{rp:false,warn:'Chuyển sang chế độ nguồn Cân bằng? Hoàn tác được.'});
 /* ---------- sự cố: nút sửa + hỏi AI ---------- */
 const aiBtn=(t,d)=>dvBt('Hỏi AI',()=>aiHelp(t,d));
+<<<<<<< HEAD
 {const o=dvBtns;dvBtns=function(it){const r=o(it),d=r[r.length-1],rw=d&&d.querySelector?d.querySelector('.row'):null;if(rw)rw.append(aiBtn(it.t,(it.sub||'')+'. '+(it.mean||'')));else r.push(aiBtn(it.t,(it.sub||'')+'. '+(it.mean||'')));return r}}
+=======
+{const o=dvBtns;dvBtns=function(it){const r=o(it);r.push(aiBtn(it.t,(it.sub||'')+'. '+(it.mean||'')));return r}}
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 const TDRPS=R`Reg 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' 'TdrDelay' 10 DWord
 Reg 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' 'TdrDdiDelay' 10 DWord`;
 const GHOST=R`Get-PnpDevice -Class Net,MEDIA,Bluetooth,Display -EA 0|?{$_.Present -eq $false}|%{pnputil /remove-device $_.InstanceId|Out-Null;L ('  da go thiet bi ma '+$_.FriendlyName)}`;
@@ -1234,9 +1288,14 @@ function evBtns(it){const o=[],b=(t,f,c)=>o.push(dvBt(t,f,c)),wu=()=>b('Tìm dri
  else if(it.k==='wuex')b('Bật lại cập nhật driver qua Windows Update',()=>dvRun(UPD.find(u=>u.k==='drv').on,'Đang bật lại',{rp:false}),'b');
  else if(it.k==='dup')b('Dọn thiết bị “ma” đã rút',()=>dvRun(GHOST,'Đang dọn thiết bị ma',{warn:'Gỡ các thiết bị mạng/âm thanh/Bluetooth/đồ họa không còn cắm khỏi Windows. Thiết bị đang dùng không bị ảnh hưởng. Tiếp tục?'}),'b');
  else if(it.k==='bios'&&DV.sys){const m=mkL(DV.sys);o.push(dvLk(m[1],'Trang '+m[0]))}
+<<<<<<< HEAD
  else if(it.cat==='old'){b('Tải và cài driver cũ (tự động)',()=>dvAutoInstall(it.rows.map(r=>r.h),it.t),'b');b('Cài từ thư mục đã tải',()=>{show(2);$('#dpath').focus()});b('Sao lưu driver trước',()=>dvRun(BKL,'Đang sao lưu driver',{rp:false}))}
  o.push(aiBtn(it.t,(it.sub||'')+'. '+(it.mean||'')));return pack(o)}
 const pack=o=>{if(o.length<=3)return o;const d=dvEl('details',''),r=dvEl('div','row');d.innerHTML='<summary>Cách khác</summary>';o.slice(2).forEach(b=>r.append(b));d.append(r);return o.slice(0,2).concat(d)};
+=======
+ else if(it.cat==='old'){b('Cập nhật tự động (Windows Update)',()=>{show(2);wuSearch()},'b');b('Cài từ thư mục đã tải',()=>{show(2);$('#dpath').focus()});b('Sao lưu driver trước',()=>dvRun(BKL,'Đang sao lưu driver',{rp:false}))}
+ o.push(aiBtn(it.t,(it.sub||'')+'. '+(it.mean||'')));return o}
+>>>>>>> 4a9f5e4a27e6ee03c347779d4b3327c79f012bd6
 const rowAct=x=>{const hw=(x.h||'').replace(/&(SUBSYS|REV|MI)_.*$/i,''),v=vend(x.h||x.id)||(DV&&DV.sys?mkL(DV.sys):null);return(hw?`<a class="lk" href="${CAT+encodeURIComponent(hw)}" target="_blank" rel="noopener">Catalog</a> `:'')+(v?`<a class="lk" href="${esc(v[1])}" target="_blank" rel="noopener">${esc(v[0])}</a>`:'')};
 async function aiHelp(t,d){if(!Object.values(AIS.keys).some(Boolean)){if(confirm('Chưa có key AI. Mở tab Hỏi AI để dán key (có key miễn phí)?'))show(9);return}
  const f=$('#fm');f.innerHTML='<h2>Cách giải quyết cụ thể</h2><div id="aiH" class="mu" style="max-height:60vh;overflow:auto">AI đang phân tích…</div><div class="row"><button class="b" onclick="this.closest(\'dialog\').close()">Đóng</button></div>';f.showModal();
